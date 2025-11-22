@@ -1,7 +1,7 @@
 // Global state
 let blocksAB = null;
 let blocksBA = null;
-const APP_VERSION = 'v0.4 (2025-11-22)';
+const APP_VERSION = 'v0.5 (2025-11-22)';
 
 // Log to console and to the autoload debug panel
 function debugLog(message) {
@@ -250,6 +250,7 @@ function renderTSVToTable(tsv) {
 
 // Run liftover PomBase→Leupold for input lines (supports points and intervals)
 function runLiftoverAB() {
+  updateDirectionNote && updateDirectionNote('AB');
   const out = [];
   out.push('contigA\tstartA\tendA\tcontigB\tstartB\tendB\tstrand\tstatus\tgaps');
   if (!blocksAB) {
@@ -282,6 +283,7 @@ function runLiftoverAB() {
 
 // Run liftover Leupold→PomBase for input lines (supports points and intervals)
 function runLiftoverBA() {
+  updateDirectionNote && updateDirectionNote('BA');
   const out = [];
   out.push('contigA\tstartA\tendA\tcontigB\tstartB\tendB\tstrand\tstatus\tgaps');
   if (!blocksBA) {
@@ -314,6 +316,7 @@ function runLiftoverBA() {
 
 // Run round-trip PomBase→Leupold→PomBase for input lines (supports points and intervals)
 function runRoundtrip() {
+  updateDirectionNote && updateDirectionNote('RT');
   const out = [];
   out.push('contigA\tstartA\tendA\tcontigB\tstartB\tendB\tcontigA2\tstartA2\tendA2\tstatus\tgapsAB\tgapsBA');
   if (!blocksAB || !blocksBA) {
@@ -372,6 +375,7 @@ async function init() {
     if (vb) vb.textContent = APP_VERSION;
   }
   writeVersion();
+
   const vt = document.getElementById('versionText');
   if (vt) vt.textContent = APP_VERSION;
 
@@ -406,6 +410,14 @@ async function init() {
   }
 
   debugLog('=== Initialization complete ===');
+}
+
+function updateDirectionNote(mode) {
+  const dn = document.getElementById('directionNote');
+  if (!dn) return;
+  if (mode === 'AB') dn.textContent = 'Current direction: A = PomBase → B = Leupold';
+  else if (mode === 'BA') dn.textContent = 'Current direction: A = Leupold → B = PomBase';
+  else if (mode === 'RT') dn.textContent = 'Current direction: A = PomBase → B = Leupold → A = PomBase';
 }
 
 // Global error logger to surface uncaught errors
