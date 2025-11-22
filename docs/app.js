@@ -1,7 +1,7 @@
 // Global state
 let blocksAB = null;
 let blocksBA = null;
-const APP_VERSION = 'gh-pages v1 (2025-11-22)';
+const APP_VERSION = 'gh-pages v2 (2025-11-22)';
 
 // Log to console and to the autoload debug panel
 function debugLog(message) {
