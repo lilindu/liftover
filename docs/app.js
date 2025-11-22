@@ -1,7 +1,7 @@
 // Global state
 let blocksAB = null;
 let blocksBA = null;
-const APP_VERSION = `gh-pages v2 (${new Date(document.lastModified).toISOString().slice(0,10)})`;
+const APP_VERSION = 'gh-pages v0.2 (2025-11-22)';
 
 // Log to console and to the autoload debug panel
 function debugLog(message) {
@@ -267,11 +267,13 @@ function runLiftoverAB() {
     if (!blocks) { out.push(`${contig}\t${start}\t${end}\t\t\t\t\tNO_CONTIG`); continue; }
     const attempt = stitchInterval(blocks, start, end);
     if (!attempt.ok) {
-      out.push(`${contig}\t${start}\t${end}\t\t\t\t\tSTITCH_FAILED_${attempt.reason}\t`);
+      const statusFail = (attempt.reason === 'UNMAPPED') ? 'UNMAPPED' : `STITCH_FAILED_${attempt.reason}`;
+      out.push(`${contig}\t${start}\t${end}\t\t\t\t\t${statusFail}\t`);
       continue;
     }
-    const gaps = (findBlock(blocks, start)===findBlock(blocks, end)) ? [] : collectGaps(blocks, findBlock(blocks, start), findBlock(blocks, end));
-    const status = (gaps.length === 0) ? ((findBlock(blocks, start)===findBlock(blocks, end))?'OK':'STITCHED_OK') : 'STITCHED_WITH_GAPS';
+    const sameBlock = (findBlock(blocks, start)===findBlock(blocks, end));
+    const gaps = sameBlock ? [] : collectGaps(blocks, findBlock(blocks, start), findBlock(blocks, end));
+    const status = sameBlock ? 'OK' : 'SPANNING_BLOCKS';
     out.push(`${contig}\t${start}\t${end}\t${attempt.contigB}\t${attempt.startB}\t${attempt.endB}\t${attempt.strand}\t${status}\t${formatGaps(gaps)}`);
   }
   document.getElementById('out').textContent = out.join('\n');
@@ -297,11 +299,13 @@ function runLiftoverBA() {
     if (!blocks) { out.push(`${contig}\t${start}\t${end}\t\t\t\t\tNO_CONTIG`); continue; }
     const attempt = stitchInterval(blocks, start, end);
     if (!attempt.ok) {
-      out.push(`${contig}\t${start}\t${end}\t\t\t\t\tSTITCH_FAILED_${attempt.reason}\t`);
+      const statusFail = (attempt.reason === 'UNMAPPED') ? 'UNMAPPED' : `STITCH_FAILED_${attempt.reason}`;
+      out.push(`${contig}\t${start}\t${end}\t\t\t\t\t${statusFail}\t`);
       continue;
     }
-    const gaps = (findBlock(blocks, start)===findBlock(blocks, end)) ? [] : collectGaps(blocks, findBlock(blocks, start), findBlock(blocks, end));
-    const status = (gaps.length === 0) ? ((findBlock(blocks, start)===findBlock(blocks, end))?'OK':'STITCHED_OK') : 'STITCHED_WITH_GAPS';
+    const sameBlock = (findBlock(blocks, start)===findBlock(blocks, end));
+    const gaps = sameBlock ? [] : collectGaps(blocks, findBlock(blocks, start), findBlock(blocks, end));
+    const status = sameBlock ? 'OK' : 'SPANNING_BLOCKS';
     out.push(`${contig}\t${start}\t${end}\t${attempt.contigB}\t${attempt.startB}\t${attempt.endB}\t${attempt.strand}\t${status}\t${formatGaps(gaps)}`);
   }
   document.getElementById('out').textContent = out.join('\n');
@@ -328,14 +332,14 @@ function runRoundtrip() {
     const blocks1 = blocksAB[contig];
     if (!blocks1) { out.push(`${contig}\t${start}\t${end}\t\t\t\t\t\t\tNO_CONTIG`); continue; }
     const attempt1 = stitchInterval(blocks1, start, end);
-    if (!attempt1.ok) { out.push(`${contig}\t${start}\t${end}\t\t\t\t\t\t\tSTITCH_FAILED_${attempt1.reason}\t\t`); continue; }
+    if (!attempt1.ok) { const status1 = (attempt1.reason === 'UNMAPPED') ? 'UNMAPPED' : `STITCH_FAILED_${attempt1.reason}`; out.push(`${contig}\t${start}\t${end}\t\t\t\t\t\t\t${status1}\t\t`); continue; }
     const gapsAB = (findBlock(blocks1, start)===findBlock(blocks1, end)) ? [] : collectGaps(blocks1, findBlock(blocks1, start), findBlock(blocks1, end));
 
     // Stage 2: Leupold→PomBase stitch
     const blocks2 = blocksBA[attempt1.contigB];
     if (!blocks2) { out.push(`${contig}\t${start}\t${end}\t${attempt1.contigB}\t${attempt1.startB}\t${attempt1.endB}\t\t\t\tNO_CONTIG_BA`); continue; }
     const attempt2 = stitchInterval(blocks2, attempt1.startB, attempt1.endB);
-    if (!attempt2.ok) { out.push(`${contig}\t${start}\t${end}\t${attempt1.contigB}\t${attempt1.startB}\t${attempt1.endB}\t\t\t\tSTITCH_FAILED_BA_${attempt2.reason}\t${formatGaps(gapsAB)}\t`); continue; }
+    if (!attempt2.ok) { const status2 = (attempt2.reason === 'UNMAPPED') ? 'UNMAPPED_BA' : `STITCH_FAILED_BA_${attempt2.reason}`; out.push(`${contig}\t${start}\t${end}\t${attempt1.contigB}\t${attempt1.startB}\t${attempt1.endB}\t\t\t\t${status2}\t${formatGaps(gapsAB)}\t`); continue; }
     const gapsBA = (findBlock(blocks2, attempt1.startB)===findBlock(blocks2, attempt1.endB)) ? [] : collectGaps(blocks2, findBlock(blocks2, attempt1.startB), findBlock(blocks2, attempt1.endB));
 
     const status = (attempt2.contigB === contig && Math.min(attempt2.startB, attempt2.endB) === start && Math.max(attempt2.startB, attempt2.endB) === end) ? 'PASS' : 'FAIL';
