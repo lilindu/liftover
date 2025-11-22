@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Genome Liftover (PomBase reference → Leupold consensus)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 2rem; }
+      textarea { width: 100%; height: 10rem; }
+      pre { background: #f6f8fa; padding: 1rem; overflow: auto; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; tab-size: 4; }
+      table { width: 100%; border-collapse: collapse; }
+      thead th { text-align: left; padding: 4px 8px; border-bottom: 1px solid #eaecef; font-weight: 600; }
+      tbody td { padding: 4px 8px; border-bottom: 1px solid #f0f0f0; white-space: nowrap; }
+      .row { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+      input[type=file] { margin-bottom: 0.5rem; }
+      button { padding: 0.5rem 1rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Genome Liftover (PomBase reference → Leupold consensus)</h1>
+    <div style="font-size:12px;color:#555;margin:4px 0;">Version: <span id="versionText"></span></div>
+    <div style="border-top:1px solid #eaecef;margin:8px 0 16px;"></div>
+    <div class="row">
+      <div id="statusAB">PomBase→Leupold: not loaded</div>
+      <div id="statusBA">Leupold→PomBase: not loaded</div>
+    </div>
+    <h3>Input Coordinates (one per line, CHR:POS or CHR:START-END)</h3>
+    <textarea id="coords" placeholder="I:1000&#10;II:250-400&#10;III:42"></textarea>
+    <div class="row">
+      <button id="runAB">Liftover PomBase→Leupold</button>
+      <button id="runBA">Liftover Leupold→PomBase</button>
+      <button id="runRoundtrip">Round-Trip PomBase→Leupold→PomBase</button>
+      <button id="download">Download Results</button>
+    </div>
+    <h3>Results</h3>
+    <div id="resultsHelp" style="background:#f6f8fa;border:1px solid #eaecef;padding:8px;margin:8px 0;font-size:12px;">
+      <strong>Explanation of the output</strong>
+      <span style="display:block;">A refers to the PomBase reference genome</span>
+      <span style="display:block;">B refers to the Leupold consensus genome</span>
+      <strong>Status:</strong>
+      <span style="display:block;">OK = Interval maps within a single block</span>
+      <span style="display:block;">STITCHED_OK = Interval spans multiple blocks, stitched with no gaps</span>
+      <span style="display:block;">STITCHED_WITH_GAPS = Interval stitched across blocks; see “gaps” column for details</span>
+      <span style="display:block;">STITCH_FAILED_UNMAPPED = One or both endpoints do not fall in any block</span>
+      <span style="display:block;">STITCH_FAILED_CONTIG = Target contig changes across blocks</span>
+      <span style="display:block;">STITCH_FAILED_STRAND = Strand changes across blocks</span>
+      <span style="display:block;">Round‑Trip: PASS = Stitched B→A interval equals original; otherwise FAIL</span>
+      <strong style="display:block;">Gaps syntax:</strong>
+      <span style="display:block;">GAP_A:N@A:start→end = N bp break on PomBase between adjacent blocks</span>
+      <span style="display:block;">GAP_B:N@B:start→end = N bp break on Leupold between stitched blocks</span>
+      <span style="display:block;">OVERLAP_B:K@B:start→end = K bp overlap in Leupold across block boundary</span>
+      <span style="display:block;">Round‑Trip columns “gapsAB” and “gapsBA” list gaps seen in each direction</span>
+    </div>
+    <table id="outTable">
+      <thead id="outHead"></thead>
+      <tbody id="outBody"></tbody>
+    </table>
+    <pre id="out" style="display:none"></pre>
+    <script src="app.js?v=autoload_fix_3"></script>
+  </body>
+</html>
