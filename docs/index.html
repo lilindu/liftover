@@ -29,11 +29,13 @@
       .badge { display: inline-block; font-size: 0.8rem; color: #374151; background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 999px; padding: 2px 8px; margin-left: 8px; }
       @media (max-width: 640px) { .title { font-size: 1.6rem; } }
       .note { font-size: 13px; color: #374151; margin: 8px 0 14px; background:#eef2ff; border:1px solid #c7d2fe; border-radius:6px; padding:6px 8px; }
+      .doclink { font-size: 0.85rem; margin-left: 10px; color: #2563eb; text-decoration: none; }
+      .doclink:hover { text-decoration: underline; }
     </style>
   </head>
   <body class="container">
     <h1 class="title">pombe_liftover</h1>
-    <div class="subtitle">converting genomic coordinates between PomBase reference and Leupold consensus <span id="versionBadge" class="badge"></span></div>
+    <div class="subtitle">converting genomic coordinates between PomBase reference and Leupold consensus <span id="versionBadge" class="badge"></span><a class="doclink" href="https://github.com/lilindu/liftover#readme" target="_blank" rel="noopener">Documentation</a></div>
     <div style="border-top:1px solid #eaecef;margin:8px 0 16px;"></div>
     <div class="status-row">
       <div id="statusAB" class="status-chip">PomBase→Leupold: not loaded</div>
@@ -68,6 +70,6 @@
       <tbody id="outBody"></tbody>
     </table>
     <pre id="out" style="display:none"></pre>
-    <script src="app.js?v=autoload_fix_17"></script>
+    <script src="app.js?v=autoload_fix_18"></script>
   </body>
 </html>
