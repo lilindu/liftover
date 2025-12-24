@@ -1,7 +1,7 @@
 // Global state
 let blocksAB = null;
 let blocksBA = null;
-const APP_VERSION = 'v0.5 (2025-11-22)';
+const APP_VERSION = 'v0.6 (2025-12-25)';
 
 // Log to console and to the autoload debug panel
 function debugLog(message) {

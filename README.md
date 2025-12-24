@@ -93,7 +93,7 @@ Pipeline notes:
 
 ## Web UI
 
-- Title/subtitle: pombe_liftover, with a version badge (e.g., `v0.5 (2025-11-22)`).
+- Title/subtitle: pombe_liftover, with a version badge (e.g., `v0.6 (2025-12-25)`).
 - Status chips: AB/BA loaded blocks.
 - Input area: textarea accepting `CHR:POS` or `CHR:START-END` (1‑based, inclusive).
 - Buttons: AB, BA, Round‑Trip, Download (unified primary style).
@@ -106,7 +106,7 @@ Pipeline notes:
 
 ## Versioning & Cache Busting
 
-- `APP_VERSION` is a literal string (e.g., `v0.5 (2025-11-22)`) set in `app.js`.
+- `APP_VERSION` is a literal string (e.g., `v0.6 (2025-12-25)`) set in `app.js`.
 - `index.html` loads `app.js` with `?v=autoload_fix_<n>` to force fresh loads on deployment.
 
 ## Local Development
@@ -144,14 +144,14 @@ Pipeline notes:
 
 ## Code References
 
-- Parse TSV: `liftover/docs/app.js:17–39`
-- Binary search: `liftover/docs/app.js:41–52`
-- Point mapping: `liftover/docs/app.js:54–65`
-- Stitch interval: `liftover/docs/app.js:137–166`
-- Collect gaps: `liftover/docs/app.js:168–207`
-- Format gaps: `liftover/docs/app.js:210–219`
-- AB liftover: `liftover/docs/app.js:251–281`
-- BA liftover: `liftover/docs/app.js:283–313`
-- Round‑Trip: `liftover/docs/app.js:316–356`
-- Direction note update: `liftover/docs/app.js:360–385, 429–436`
-- Render TSV: `liftover/docs/app.js:222–249`
+- Parse TSV: `liftover/docs/app.js:18–40`
+- Binary search: `liftover/docs/app.js:42–53`
+- Point mapping: `liftover/docs/app.js:55–66`
+- Stitch interval: `liftover/docs/app.js:151–180`
+- Collect gaps: `liftover/docs/app.js:182–220`
+- Format gaps: `liftover/docs/app.js:222–233`
+- AB liftover: `liftover/docs/app.js:264–295`
+- BA liftover: `liftover/docs/app.js:297–328`
+- Round‑Trip: `liftover/docs/app.js:330–369`
+- Direction note update: `liftover/docs/app.js:427–436`
+- Render TSV: `liftover/docs/app.js:235–262`
