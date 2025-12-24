@@ -64,6 +64,14 @@ function mapPoint(block, posA) {
   }
 }
 
+function toZeroBased(posOneBased) {
+  return posOneBased - 1;
+}
+
+function toOneBased(posZeroBased) {
+  return posZeroBased + 1;
+}
+
 // Fetch default PomBase→Leupold blocks from server with cache-busting
 async function loadDefaultAB() {
   const statusAB = document.getElementById('statusAB');
@@ -109,16 +117,22 @@ function parseInputLine(line) {
   const contig = parts[0];
   const coords = parts[1];
   if (/^\d+$/.test(coords)) {
-    const pos = parseInt(coords);
-    return { contig, start: pos, end: pos, isInterval: false };
+    const posOneBased = parseInt(coords);
+    if (!Number.isFinite(posOneBased) || posOneBased < 1) return null;
+    const posZeroBased = toZeroBased(posOneBased);
+    return { contig, start: posZeroBased, end: posZeroBased, isInterval: false };
   }
   const m = coords.match(/^(\d+)-(\d+)$/);
   if (!m) return null;
-  const a = parseInt(m[1]);
-  const b = parseInt(m[2]);
-  const start = Math.min(a, b);
-  const end = Math.max(a, b);
-  return { contig, start, end, isInterval: true };
+  const aOneBased = parseInt(m[1]);
+  const bOneBased = parseInt(m[2]);
+  if (!Number.isFinite(aOneBased) || !Number.isFinite(bOneBased)) return null;
+  if (aOneBased < 1 || bOneBased < 1) return null;
+  const startOneBased = Math.min(aOneBased, bOneBased);
+  const endOneBased = Math.max(aOneBased, bOneBased);
+  const startZeroBased = toZeroBased(startOneBased);
+  const endZeroBased = toZeroBased(endOneBased);
+  return { contig, start: startZeroBased, end: endZeroBased, isInterval: true };
 }
 
 // Map an interval entirely contained within a single block; returns [contigB, startB, endB, strand]
@@ -180,28 +194,26 @@ function collectGaps(blocks, startIdx, endIdx) {
     }
     const gapA = Math.max(0, next.startA - cur.endA);
     if (gapA > 0) {
-      gaps.push({ type: 'GAP_A', sizeA: gapA, aStart: cur.endA + 1, aEnd: next.startA - 1 });
+      gaps.push({ type: 'GAP_A', sizeA: gapA, aStart: toOneBased(cur.endA), aEnd: toOneBased(next.startA - 1) });
     }
     const bEnd = mapPoint(cur, cur.endA - 1)[1];
     const bStartNext = mapPoint(next, next.startA)[1];
     if (targetStrand === '+') {
       const gapB = Math.max(0, bStartNext - bEnd - 1);
       const ovlB = Math.max(0, bEnd - bStartNext + 1);
-      if (gapB > 0) gaps.push({ type: 'GAP_B', sizeB: gapB, bStart: bEnd + 1, bEnd: bStartNext - 1 });
-      if (ovlB > 0) gaps.push({ type: 'OVERLAP_B', sizeB: ovlB, bStart: bStartNext, bEnd: bEnd });
+      if (gapB > 0) gaps.push({ type: 'GAP_B', sizeB: gapB, bStart: toOneBased(bEnd + 1), bEnd: toOneBased(bStartNext - 1) });
+      if (ovlB > 0) gaps.push({ type: 'OVERLAP_B', sizeB: ovlB, bStart: toOneBased(bStartNext), bEnd: toOneBased(bEnd) });
     } else {
       const gapB = Math.max(0, bEnd - bStartNext - 1);
       const ovlB = Math.max(0, bStartNext - bEnd + 1);
       if (gapB > 0) {
-        const gs = Math.min(bEnd - 1, bStartNext + 1);
-        const ge = Math.max(bEnd - 1, bStartNext + 1);
-        gaps.push({ type: 'GAP_B', sizeB: gapB, bStart: gs, bEnd: ge });
-      }
-      if (ovlB > 0) {
-        const os = Math.min(bStartNext, bEnd);
-        const oe = Math.max(bStartNext, bEnd);
-        gaps.push({ type: 'OVERLAP_B', sizeB: ovlB, bStart: os, bEnd: oe });
-      }
+      const lo = bStartNext + 1;
+      const hi = bEnd - 1;
+      gaps.push({ type: 'GAP_B', sizeB: gapB, bStart: toOneBased(Math.min(lo, hi)), bEnd: toOneBased(Math.max(lo, hi)) });
+    }
+    if (ovlB > 0) {
+      gaps.push({ type: 'OVERLAP_B', sizeB: ovlB, bStart: toOneBased(Math.min(bStartNext, bEnd)), bEnd: toOneBased(Math.max(bStartNext, bEnd)) });
+    }
     }
   }
   return gaps;
@@ -265,17 +277,17 @@ function runLiftoverAB() {
     if (!parsed) { out.push('\t\t\t\t\t\t\tBAD_INPUT\t'); continue; }
     const { contig, start, end } = parsed;
     const blocks = blocksAB[contig];
-    if (!blocks) { out.push(`${contig}\t${start}\t${end}\t\t\t\t\tNO_CONTIG`); continue; }
+    if (!blocks) { out.push(`${contig}\t${toOneBased(start)}\t${toOneBased(end)}\t\t\t\t\tNO_CONTIG`); continue; }
     const attempt = stitchInterval(blocks, start, end);
     if (!attempt.ok) {
       const statusFail = (attempt.reason === 'UNMAPPED') ? 'UNMAPPED' : `STITCH_FAILED_${attempt.reason}`;
-      out.push(`${contig}\t${start}\t${end}\t\t\t\t\t${statusFail}\t`);
+      out.push(`${contig}\t${toOneBased(start)}\t${toOneBased(end)}\t\t\t\t\t${statusFail}\t`);
       continue;
     }
     const sameBlock = (findBlock(blocks, start) === findBlock(blocks, end));
     const gaps = sameBlock ? [] : collectGaps(blocks, findBlock(blocks, start), findBlock(blocks, end));
     const status = sameBlock ? 'OK' : 'SPANNING_BLOCKS';
-    out.push(`${contig}\t${start}\t${end}\t${attempt.contigB}\t${attempt.startB}\t${attempt.endB}\t${attempt.strand}\t${status}\t${formatGaps(gaps)}`);
+    out.push(`${contig}\t${toOneBased(start)}\t${toOneBased(end)}\t${attempt.contigB}\t${toOneBased(attempt.startB)}\t${toOneBased(attempt.endB)}\t${attempt.strand}\t${status}\t${formatGaps(gaps)}`);
   }
   document.getElementById('out').textContent = out.join('\n');
   renderTSVToTable(document.getElementById('out').textContent);
@@ -298,17 +310,17 @@ function runLiftoverBA() {
     if (!parsed) { out.push('\t\t\t\t\t\t\tBAD_INPUT\t'); continue; }
     const { contig, start, end } = parsed;
     const blocks = blocksBA[contig];
-    if (!blocks) { out.push(`${contig}\t${start}\t${end}\t\t\t\t\tNO_CONTIG`); continue; }
+    if (!blocks) { out.push(`${contig}\t${toOneBased(start)}\t${toOneBased(end)}\t\t\t\t\tNO_CONTIG`); continue; }
     const attempt = stitchInterval(blocks, start, end);
     if (!attempt.ok) {
       const statusFail = (attempt.reason === 'UNMAPPED') ? 'UNMAPPED' : `STITCH_FAILED_${attempt.reason}`;
-      out.push(`${contig}\t${start}\t${end}\t\t\t\t\t${statusFail}\t`);
+      out.push(`${contig}\t${toOneBased(start)}\t${toOneBased(end)}\t\t\t\t\t${statusFail}\t`);
       continue;
     }
     const sameBlock = (findBlock(blocks, start) === findBlock(blocks, end));
     const gaps = sameBlock ? [] : collectGaps(blocks, findBlock(blocks, start), findBlock(blocks, end));
     const status = sameBlock ? 'OK' : 'SPANNING_BLOCKS';
-    out.push(`${contig}\t${start}\t${end}\t${attempt.contigB}\t${attempt.startB}\t${attempt.endB}\t${attempt.strand}\t${status}\t${formatGaps(gaps)}`);
+    out.push(`${contig}\t${toOneBased(start)}\t${toOneBased(end)}\t${attempt.contigB}\t${toOneBased(attempt.startB)}\t${toOneBased(attempt.endB)}\t${attempt.strand}\t${status}\t${formatGaps(gaps)}`);
   }
   document.getElementById('out').textContent = out.join('\n');
   renderTSVToTable(document.getElementById('out').textContent);
@@ -333,23 +345,23 @@ function runRoundtrip() {
 
     // Stage 1: PomBase→Leupold stitch
     const blocks1 = blocksAB[contig];
-    if (!blocks1) { out.push(`${contig}\t${start}\t${end}\t\t\t\t\t\t\tNO_CONTIG`); continue; }
+    if (!blocks1) { out.push(`${contig}\t${toOneBased(start)}\t${toOneBased(end)}\t\t\t\t\t\t\tNO_CONTIG`); continue; }
     const attempt1 = stitchInterval(blocks1, start, end);
-    if (!attempt1.ok) { out.push(`${contig}\t${start}\t${end}\t\t\t\t\t\t\tSTITCH_FAILED_${attempt1.reason}\t\t`); continue; }
+    if (!attempt1.ok) { out.push(`${contig}\t${toOneBased(start)}\t${toOneBased(end)}\t\t\t\t\t\t\tSTITCH_FAILED_${attempt1.reason}\t\t`); continue; }
     const sameAB = (findBlock(blocks1, start) === findBlock(blocks1, end));
     const gapsAB = sameAB ? [] : collectGaps(blocks1, findBlock(blocks1, start), findBlock(blocks1, end));
 
     const blocks2 = blocksBA[attempt1.contigB];
-    if (!blocks2) { out.push(`${contig}\t${start}\t${end}\t${attempt1.contigB}\t${attempt1.startB}\t${attempt1.endB}\t\t\t\tNO_CONTIG_BA`); continue; }
+    if (!blocks2) { out.push(`${contig}\t${toOneBased(start)}\t${toOneBased(end)}\t${attempt1.contigB}\t${toOneBased(attempt1.startB)}\t${toOneBased(attempt1.endB)}\t\t\t\tNO_CONTIG_BA`); continue; }
     const attempt2 = stitchInterval(blocks2, attempt1.startB, attempt1.endB);
-    if (!attempt2.ok) { const status2 = (attempt2.reason === 'UNMAPPED') ? 'UNMAPPED_BA' : `STITCH_FAILED_BA_${attempt2.reason}`; out.push(`${contig}\t${start}\t${end}\t${attempt1.contigB}\t${attempt1.startB}\t${attempt1.endB}\t\t\t\t${status2}\t${formatGaps(gapsAB)}\t`); continue; }
+    if (!attempt2.ok) { const status2 = (attempt2.reason === 'UNMAPPED') ? 'UNMAPPED_BA' : `STITCH_FAILED_BA_${attempt2.reason}`; out.push(`${contig}\t${toOneBased(start)}\t${toOneBased(end)}\t${attempt1.contigB}\t${toOneBased(attempt1.startB)}\t${toOneBased(attempt1.endB)}\t\t\t\t${status2}\t${formatGaps(gapsAB)}\t`); continue; }
     const sameBA = (findBlock(blocks2, attempt1.startB) === findBlock(blocks2, attempt1.endB));
     const gapsBA = sameBA ? [] : collectGaps(blocks2, findBlock(blocks2, attempt1.startB), findBlock(blocks2, attempt1.endB));
 
     const startA2 = Math.min(attempt2.startB, attempt2.endB);
     const endA2 = Math.max(attempt2.startB, attempt2.endB);
     const status = (attempt2.contigB === contig && startA2 === start && endA2 === end) ? 'PASS' : 'FAIL';
-    out.push(`${contig}\t${start}\t${end}\t${attempt1.contigB}\t${attempt1.startB}\t${attempt1.endB}\t${attempt2.contigB}\t${startA2}\t${endA2}\t${status}\t${formatGaps(gapsAB)}\t${formatGaps(gapsBA)}`);
+    out.push(`${contig}\t${toOneBased(start)}\t${toOneBased(end)}\t${attempt1.contigB}\t${toOneBased(attempt1.startB)}\t${toOneBased(attempt1.endB)}\t${attempt2.contigB}\t${toOneBased(startA2)}\t${toOneBased(endA2)}\t${status}\t${formatGaps(gapsAB)}\t${formatGaps(gapsBA)}`);
   }
   document.getElementById('out').textContent = out.join('\n');
   renderTSVToTable(document.getElementById('out').textContent);
