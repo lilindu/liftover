@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>pombe_liftover (converting genomic coordinates between PomBase reference and Leupold consensus)</title>
+    <title>pombe_liftover (converting genomic coordinates between PomBase reference and Leupold clade consensus)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
       body { font-family: system-ui, sans-serif; margin: 2rem; }
@@ -35,18 +35,18 @@
   </head>
   <body class="container">
     <h1 class="title">pombe_liftover</h1>
-    <div class="subtitle">converting genomic coordinates between PomBase reference and Leupold consensus <span id="versionBadge" class="badge"></span><a class="doclink" href="https://github.com/lilindu/liftover#readme" target="_blank" rel="noopener">Documentation</a></div>
+    <div class="subtitle">converting genomic coordinates between PomBase reference and Leupold clade consensus <span id="versionBadge" class="badge"></span><a class="doclink" href="https://github.com/lilindu/liftover#readme" target="_blank" rel="noopener">Documentation</a></div>
     <div style="border-top:1px solid #eaecef;margin:8px 0 16px;"></div>
     <div class="status-row">
-      <div id="statusAB" class="status-chip">PomBase→Leupold: not loaded</div>
-      <div id="statusBA" class="status-chip">Leupold→PomBase: not loaded</div>
+      <div id="statusAB" class="status-chip">PomBase→Leupold clade: not loaded</div>
+      <div id="statusBA" class="status-chip">Leupold clade→PomBase: not loaded</div>
     </div>
     <h3>Input coordinates (one per line, CHR:POS or CHR:START-END; coordinates are 1-based and inclusive)</h3>
     <textarea id="coords" placeholder="I:1000&#10;II:250-400&#10;III:42"></textarea>
     <div class="row">
-      <button id="runAB" class="btn btn-primary">Liftover PomBase→Leupold</button>
-      <button id="runBA" class="btn btn-primary">Liftover Leupold→PomBase</button>
-      <button id="runRoundtrip" class="btn btn-primary">Round-Trip PomBase→Leupold→PomBase</button>
+      <button id="runAB" class="btn btn-primary">Liftover PomBase→Leupold clade</button>
+      <button id="runBA" class="btn btn-primary">Liftover Leupold clade→PomBase</button>
+      <button id="runRoundtrip" class="btn btn-primary">Round-Trip PomBase→Leupold clade→PomBase</button>
       <button id="download" class="btn btn-primary">Download Results</button>
     </div>
     <h3>Results</h3>

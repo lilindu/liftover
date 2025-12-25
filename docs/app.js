@@ -72,39 +72,39 @@ function toOneBased(posZeroBased) {
   return posZeroBased + 1;
 }
 
-// Fetch default PomBase→Leupold blocks from server with cache-busting
+// Fetch default PomBase→Leupold clade blocks from server with cache-busting
 async function loadDefaultAB() {
   const statusAB = document.getElementById('statusAB');
   try {
-    debugLog('Fetching PomBase→Leupold blocks...');
+    debugLog('Fetching PomBase→Leupold clade blocks...');
     const res = await fetch('A_to_B.blocks.tsv?v=' + Date.now());
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const txt = await res.text();
     blocksAB = parseTSV(txt);
     const count = Object.keys(blocksAB).reduce((s, c) => s + blocksAB[c].length, 0);
-    if (statusAB) statusAB.textContent = 'PomBase→Leupold: blocks file loaded (' + count + ' blocks)';
-    debugLog('PomBase→Leupold blocks file loaded: ' + count + ' blocks');
+    if (statusAB) statusAB.textContent = 'PomBase→Leupold clade: blocks file loaded (' + count + ' blocks)';
+    debugLog('PomBase→Leupold clade blocks file loaded: ' + count + ' blocks');
   } catch (e) {
-    if (statusAB) statusAB.textContent = 'PomBase→Leupold: failed (' + e.message + ')';
-    debugLog('PomBase→Leupold failed: ' + e.message);
+    if (statusAB) statusAB.textContent = 'PomBase→Leupold clade: failed (' + e.message + ')';
+    debugLog('PomBase→Leupold clade failed: ' + e.message);
   }
 }
 
-// Fetch default Leupold→PomBase blocks from server with cache-busting
+// Fetch default Leupold clade→PomBase blocks from server with cache-busting
 async function loadDefaultBA() {
   const statusBA = document.getElementById('statusBA');
   try {
-    debugLog('Fetching Leupold→PomBase blocks...');
+    debugLog('Fetching Leupold clade→PomBase blocks...');
     const res = await fetch('B_to_A.blocks.tsv?v=' + Date.now());
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const txt = await res.text();
     blocksBA = parseTSV(txt);
     const count = Object.keys(blocksBA).reduce((s, c) => s + blocksBA[c].length, 0);
-    if (statusBA) statusBA.textContent = 'Leupold→PomBase: blocks file loaded (' + count + ' blocks)';
-    debugLog('Leupold→PomBase blocks file loaded: ' + count + ' blocks');
+    if (statusBA) statusBA.textContent = 'Leupold clade→PomBase: blocks file loaded (' + count + ' blocks)';
+    debugLog('Leupold clade→PomBase blocks file loaded: ' + count + ' blocks');
   } catch (e) {
-    if (statusBA) statusBA.textContent = 'Leupold→PomBase: failed (' + e.message + ')';
-    debugLog('Leupold→PomBase failed: ' + e.message);
+    if (statusBA) statusBA.textContent = 'Leupold clade→PomBase: failed (' + e.message + ')';
+    debugLog('Leupold clade→PomBase failed: ' + e.message);
   }
 }
 
@@ -260,7 +260,7 @@ function renderTSVToTable(tsv) {
   }
 }
 
-// Run liftover PomBase→Leupold for input lines (supports points and intervals)
+// Run liftover PomBase→Leupold clade for input lines (supports points and intervals)
 function runLiftoverAB() {
   updateDirectionNote && updateDirectionNote('AB');
   const out = [];
@@ -293,7 +293,7 @@ function runLiftoverAB() {
   renderTSVToTable(document.getElementById('out').textContent);
 }
 
-// Run liftover Leupold→PomBase for input lines (supports points and intervals)
+// Run liftover Leupold clade→PomBase for input lines (supports points and intervals)
 function runLiftoverBA() {
   updateDirectionNote && updateDirectionNote('BA');
   const out = [];
@@ -326,7 +326,7 @@ function runLiftoverBA() {
   renderTSVToTable(document.getElementById('out').textContent);
 }
 
-// Run round-trip PomBase→Leupold→PomBase for input lines (supports points and intervals)
+// Run round-trip PomBase→Leupold clade→PomBase for input lines (supports points and intervals)
 function runRoundtrip() {
   updateDirectionNote && updateDirectionNote('RT');
   const out = [];
@@ -343,7 +343,7 @@ function runRoundtrip() {
     if (!parsed) { out.push('\t\t\t\t\t\t\t\t\tBAD_INPUT\t\t'); continue; }
     const { contig, start, end } = parsed;
 
-    // Stage 1: PomBase→Leupold stitch
+    // Stage 1: PomBase→Leupold clade stitch
     const blocks1 = blocksAB[contig];
     if (!blocks1) { out.push(`${contig}\t${toOneBased(start)}\t${toOneBased(end)}\t\t\t\t\t\t\tNO_CONTIG`); continue; }
     const attempt1 = stitchInterval(blocks1, start, end);
@@ -393,8 +393,8 @@ async function init() {
 
   const sAB = document.getElementById('statusAB');
   const sBA = document.getElementById('statusBA');
-  if (sAB) sAB.textContent = 'PomBase→Leupold: autoload starting';
-  if (sBA) sBA.textContent = 'Leupold→PomBase: autoload starting';
+  if (sAB) sAB.textContent = 'PomBase→Leupold clade: autoload starting';
+  if (sBA) sBA.textContent = 'Leupold clade→PomBase: autoload starting';
 
   // Attach UI handlers
   const el = (id) => document.getElementById(id);
@@ -427,9 +427,9 @@ async function init() {
 function updateDirectionNote(mode) {
   const dn = document.getElementById('directionNote');
   if (!dn) return;
-  if (mode === 'AB') dn.textContent = 'Current direction: A = PomBase → B = Leupold';
-  else if (mode === 'BA') dn.textContent = 'Current direction: A = Leupold → B = PomBase';
-  else if (mode === 'RT') dn.textContent = 'Current direction: A = PomBase → B = Leupold → A = PomBase';
+  if (mode === 'AB') dn.textContent = 'Current direction: A = PomBase → B = Leupold clade';
+  else if (mode === 'BA') dn.textContent = 'Current direction: A = Leupold clade → B = PomBase';
+  else if (mode === 'RT') dn.textContent = 'Current direction: A = PomBase → B = Leupold clade → A = PomBase';
 }
 
 // Global error logger to surface uncaught errors

@@ -1,6 +1,6 @@
 # pombe_liftover
 
-A static, client‑side liftover tool that converts genomic coordinates between the PomBase reference genome and the Leupold consensus genome. The app runs entirely in the browser and is published via GitHub Pages.
+A static, client‑side liftover tool that converts genomic coordinates between the PomBase reference genome and the Leupold clade consensus genome. The app runs entirely in the browser and is published via GitHub Pages.
 
 - Live site: `https://lilindu.github.io/liftover/`
 - Local Pages copy: `http://localhost:8001/docs/`
@@ -17,11 +17,11 @@ A static, client‑side liftover tool that converts genomic coordinates between 
 
 ## Blocks File Generation
 
-Goal: Produce high‑confidence, contiguous A→B and B→A blocks that map the PomBase reference to the Leupold consensus with strand and contig annotations suitable for liftover.
+Goal: Produce high‑confidence, contiguous A→B and B→A blocks that map the PomBase reference to the Leupold clade consensus with strand and contig annotations suitable for liftover.
 
 Inputs:
 - A (source): PomBase reference chromosomes I/II/III (FASTA)
-- B (target): Leupold consensus chromosomes I/II/III (FASTA)
+- B (target): Leupold clade consensus chromosomes I/II/III (FASTA)
 
 **Run Alignment**
 - Command:
@@ -99,9 +99,9 @@ Pipeline notes:
 - Buttons: AB, BA, Round‑Trip, Download (unified primary style).
 - Explanation box: A=source; B=target; status and gaps syntax.
 - Dynamic direction:
-  - AB: `Current direction: A = PomBase → B = Leupold`
-  - BA: `Current direction: A = Leupold → B = PomBase`
-  - Round‑Trip: `Current direction: A = PomBase → B = Leupold → A = PomBase`
+  - AB: `Current direction: A = PomBase → B = Leupold clade`
+  - BA: `Current direction: A = Leupold clade → B = PomBase`
+  - Round‑Trip: `Current direction: A = PomBase → B = Leupold clade → A = PomBase`
 - Results table: sticky header, zebra rows, right‑aligned numerics, wrapped “gaps”.
 
 ## Versioning & Cache Busting
