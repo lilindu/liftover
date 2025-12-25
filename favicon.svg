@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Stylized Fission Yeast Cell (Schizosaccharomyces pombe) -->
+  <!-- Shape: Rod/Pill shape, rotated 45 degrees -->
+  <!-- Color: Soft purple/blue gradient -->
+  
+  <defs>
+    <linearGradient id="cellGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#9b59b6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8e44ad;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Group rotated 45 degrees around center (50,50) -->
+  <g transform="rotate(-45, 50, 50)">
+    <!-- Main Cell Body -->
+    <!-- Outline color is #2c3e50 (dark blue-grey), width 2 -->
+    <rect x="15" y="30" width="70" height="40" rx="20" ry="20" fill="url(#cellGradient)" stroke="#2c3e50" stroke-width="2" />
+    
+    <!-- Septum (Division Ring) -->
+    <!-- Color: Black (#000000) -->
+    <!-- Width: 2 (matches cell outline) -->
+    <line x1="50" y1="30" x2="50" y2="70" stroke="#000000" stroke-width="2" stroke-linecap="butt" />
+    
+    <!-- Cell Wall Highlight (optional shine) -->
+    <path d="M 25 38 Q 50 38 75 38" stroke="white" stroke-width="2" stroke-opacity="0.3" fill="none" />
+  </g>
+</svg>
