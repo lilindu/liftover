@@ -1,157 +1,71 @@
-# pombe_liftover
+# SchizoLift
 
-A static, client‑side liftover tool that converts genomic coordinates between the PomBase reference genome and the Leupold clade consensus genome. The app runs entirely in the browser and is published via GitHub Pages.
+**SchizoLift** is a client-side web tool for genome coordinate conversion for _Schizosaccharomyces_ species. It allows researchers to easily convert genomic coordinates between different reference genomes and clade consensus sequences.
 
-- Live site: `https://lilindu.github.io/liftover/`
-- Local Pages copy: `http://localhost:8001/docs/`
-- Local dev app: `http://localhost:8000/web/`
+**Live Tool:** [https://lilindu.github.io/liftover/](https://lilindu.github.io/liftover/)
 
-## Repository Layout
+## Features
 
-- `docs/index.html` — Web UI and styles for the GitHub Pages site
-- `docs/app.js` — Liftover logic, UI wiring, status updates, version badge
-- `docs/A_to_B.blocks.tsv` — Blocks mapping A→B (PomBase → Leupold)
-- `docs/B_to_A.blocks.tsv` — Blocks mapping B→A (Leupold → PomBase)
-- `liftover_tool/web/index.html` — Local dev HTML
-- `liftover_tool/web/app.js` — Local dev JS
+*   **Multi-Genome Support:** Easily switch between different genome pairs (e.g., PomBase ↔ Leupold Consensus).
+*   **Client-Side Execution:** Runs entirely in your web browser. No data is sent to a server, ensuring privacy and speed.
+*   **Detailed Reporting:** Handles simple point conversion and complex interval stitching, reporting gaps and block boundaries.
+*   **Round-Trip Validation:** Includes a feature to map coordinates A→B and then B→A to verify consistency.
 
-## Blocks File Generation
+## Supported Genome Pairs
 
-Goal: Produce high‑confidence, contiguous A→B and B→A blocks that map the PomBase reference to the Leupold clade consensus with strand and contig annotations suitable for liftover.
+*   **PomBase ↔ Leupold Consensus**: Mapping between the standard *S. pombe* reference (PomBase) and the Leupold clade consensus.
+*   **PomBase ↔ DY47073**: Mapping between PomBase and the DY47073 strain.
 
-Inputs:
-- A (source): PomBase reference chromosomes I/II/III (FASTA)
-- B (target): Leupold clade consensus chromosomes I/II/III (FASTA)
+## Usage
 
-**Run Alignment**
-- Command:
-  - `minimap2 -cx asm5 -c --secondary=no Leupold_consensus_genome_250919/Lcon_v250825_genome.fa Schizosaccharomyces_pombe_chromosome_I.fa Schizosaccharomyces_pombe_chromosome_II.fa Schizosaccharomyces_pombe_chromosome_III.fa > A_to_B.paf`
+1.  **Select Genome Pair**: Use the dropdown menu at the top to choose the desired genome pair.
+2.  **Input Coordinates**: Enter coordinates in the text area. Supported formats (1-based, inclusive):
+    *   `CHR:POS` (e.g., `I:1000`)
+    *   `CHR:START-END` (e.g., `II:200-500`)
+3.  **Run Liftover**: Click the appropriate button (e.g., "Liftover A→B") to perform the conversion.
+4.  **View/Download**: Results are displayed in a table below and can be downloaded as a TSV file.
 
-**Generate Mapping Blocks**
-- Command:
-  - `python3 cli/paf_to_blocks.py A_to_B.paf -o A_to_B.blocks.tsv`
-- Block schema:
-  - `contigA  startA  endA  contigB  startB  endB  strand  mapq` (0‑based, half‑open)
+## Development
 
-Pipeline notes:
-- Use minimap2 `-x asm5` for high‑identity assemblies; `--secondary=no` filters secondary matches.
-- Merge adjacent A→B hits on the same `contigB` and `strand` while enforcing A‑side non‑overlap.
-- Confirm homogeneity (target contig and strand) within each block.
-- Sort blocks per `contigA` by `startA`.
+The project is hosted on GitHub Pages. The core logic resides in the `web/` directory.
 
-## Coordinate Systems
+### Directory Structure
 
-### Coordinate Systems at a Glance
+*   `web/index.html`: The main user interface.
+*   `web/app.js`: Application logic for coordinate conversion and UI management.
+*   `web/data/`: Contains the block mapping files for different genome pairs.
 
-| Item | Blocks TSV (0-based, half-open) | UI input/output (1-based, inclusive) | Conversion |
-|---|---|---|---|
-| Point | `pos0` | `pos1` | `pos1 = pos0 + 1` |
-| Interval start | `start0` | `start1` | `start1 = start0 + 1` |
-| Interval end | `end0` (exclusive) | `end1` (inclusive) | `end1 = end0` |
-| Interval length | `end0 - start0` | `end1 - start1 + 1` | equal |
+### Adding New Genome Pairs
 
-### Examples
+To add a new pair (e.g., GenomeX ↔ GenomeY), use the `cli/generate_blocks.sh` script.
 
-- Block row (TSV):
-  - `contigA I  startA0 100  endA0 200  contigB …  startB0 5000  endB0 5100  strand +`
-  - Visible span in UI terms: `I:101–200` maps to `…:5001–5100`.
-- UI input `I:101–120` corresponds to TSV interval `[100,120)` on A; if mapped B endpoints in TSV are `5001–5020`, the UI shows `…:5001–5020`.
-- Strand handling: TSV stores endpoints as 0‑based, half‑open; the strand affects how `mapPoint` computes B positions, but UI rendering remains 1‑based, inclusive.
+1.  **Prepare FASTA files**: Ensure you have the FASTA files for both genomes (e.g., `genomeX.fa` and `genomeY.fa`).
+2.  **Run the Generation Script**:
+    ```bash
+    ./cli/generate_blocks.sh <genomeX.fa> <genomeY.fa> web/data/genomex_genomey
+    ```
+    This script automatically:
+    *   Aligns Genome X → Genome Y (and vice-versa) using `minimap2`.
+    *   Converts the alignments to block files (`A_to_B.blocks.tsv` and `B_to_A.blocks.tsv`).
+    *   Places them in the specified output directory.
 
-## Liftover Algorithm
+3.  **Update Configuration**:
+    *   Open `web/app.js`.
+    *   Add a new entry to the `GENOME_PAIRS` object:
+        ```javascript
+        'genomex_genomey': {
+          name: 'Genome X ↔ Genome Y',
+          genomeA: 'Genome X',
+          genomeB: 'Genome Y',
+          fileAB: 'data/genomex_genomey/A_to_B.blocks.tsv',
+          fileBA: 'data/genomex_genomey/B_to_A.blocks.tsv'
+        },
+        ```
 
-- Parse and index blocks
-  - `parseTSV(text)` builds `{ contigA: Block[] }` sorted by `startA`.
-- Block search
-  - `findBlock(blocks, pos)` returns the index of the block containing `pos`.
-- Point mapping
-  - `mapPoint(block, posA)` maps a single A position to B respecting block strand.
-- Single‑block interval
-  - `mapInterval(block, startA, endA)` → `[contigB, startB, endB, strand]`.
-- Stitching across blocks
-  - `stitchInterval(blocks, startA, endA)`:
-    - Fails as `UNMAPPED` if endpoints lie outside blocks.
-    - Enforces target `contigB` and `strand` consistency.
-    - Maps stitched ends via `mapPoint` and normalizes B `[startB,endB]`.
-- Gap and overlap reporting
-  - `collectGaps(blocks, startIdx, endIdx)` emits:
-    - `GAP_A:N@A:start→end`, `GAP_B:N@B:start→end`, `OVERLAP_B:N@B:start→end`
-    - `CONTIG_CHANGE`, `STRAND_CHANGE` when encountered
-  - `formatGaps(gaps)` renders compact tokens.
-- Execution
-  - AB liftover iterates inputs; status = `OK` or `SPANNING_BLOCKS`, `UNMAPPED` on failure.
-  - BA liftover mirrors AB.
-- Round‑Trip validation
-  - A→B then B→A; status `PASS` only if mapped‑back interval equals original, else `FAIL`.
+### Requirements for Script
+*   `minimap2` must be installed. The script defaults to a specific path; edit `cli/generate_blocks.sh` if your path differs.
+*   Python 3.
 
-## Status Semantics
+## License
 
-- `OK` — Interval maps within a single block
-- `SPANNING_BLOCKS` — Interval spans multiple blocks; see “gaps”
-- `UNMAPPED` — One or both endpoints do not fall in any block
-- Round‑Trip: `PASS` if B→A equals original; otherwise `FAIL`
-
-## Web UI
-
-- Title/subtitle: pombe_liftover, with a version badge (e.g., `v0.81 (2025-12-25)`).
-- Status chips: AB/BA loaded blocks.
-- Input area: textarea accepting `CHR:POS` or `CHR:START-END` (1‑based, inclusive).
-- Buttons: AB, BA, Round‑Trip, Download (unified primary style).
-- Explanation box: A=source; B=target; status and gaps syntax.
-- Dynamic direction:
-  - AB: `Current direction: A = PomBase → B = Leupold clade`
-  - BA: `Current direction: A = Leupold clade → B = PomBase`
-  - Round‑Trip: `Current direction: A = PomBase → B = Leupold clade → A = PomBase`
-- Results table: sticky header, zebra rows, right‑aligned numerics, wrapped “gaps”.
-
-## Versioning & Cache Busting
-
-- `APP_VERSION` is a literal string (e.g., `v0.81 (2025-12-25)`) set in `app.js`.
-- `index.html` loads `app.js` with `?v=autoload_fix_<n>` to force fresh loads on deployment.
-
-## Local Development
-
-- Serve `docs/`: `python3 -m http.server 8001` then open `http://localhost:8001/docs/`.
-- Serve local app: `python3 -m http.server 8000` in `liftover_tool/` then open `http://localhost:8000/web/`.
-- Testing:
-  - AB/BA liftover produces `OK` / `SPANNING_BLOCKS` with meaningful `gaps`.
-  - Round‑Trip produces `PASS/FAIL` with `gapsAB/gapsBA`.
-
-## Deployment (GitHub Pages)
-
-- Settings: Repository → Settings → Pages → Source: `main`, Folder: `/docs`.
-- Push changes to `main`; Pages rebuild in ~1–2 minutes.
-- Hard refresh `https://lilindu.github.io/liftover/`.
-
-## Design Rationale
-
-- Client‑only tool: easy hosting and reproducibility.
-- Non‑overlapping A blocks: simplifies search and avoids ambiguity.
-- Reporting gaps/overlaps on B: makes local alignment artifacts explicit.
-
-## Extensibility
-
-- Stitch tolerance slider to treat tiny gaps as contiguous.
-- Table filters/sorting and copy helpers.
-- URL state for sharing input sessions.
-- Accessibility: keyboard shortcuts; high‑contrast theme toggle.
-
-## Known Limitations
-
-- Overlapping A blocks are not supported by design.
-- If contig/strand transitions are encountered mid‑stitch, liftover fails to preserve correctness.
-- Inputs must be 1‑based, inclusive; malformed lines are rejected.
-
-## Code References
-
-- Parse TSV: `liftover/docs/app.js:18–40`
-- Binary search: `liftover/docs/app.js:42–53`
-- Point mapping: `liftover/docs/app.js:55–66`
-- Stitch interval: `liftover/docs/app.js:151–180`
-- Collect gaps: `liftover/docs/app.js:182–220`
-- Format gaps: `liftover/docs/app.js:222–233`
-- AB liftover: `liftover/docs/app.js:264–295`
-- BA liftover: `liftover/docs/app.js:297–328`
-- Round‑Trip: `liftover/docs/app.js:330–369`
-- Direction note update: `liftover/docs/app.js:427–436`
-- Render TSV: `liftover/docs/app.js:235–262`
+[MIT License](LICENSE)
