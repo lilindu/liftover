@@ -1,7 +1,7 @@
 // Global state
 let blocksAB = null;
 let blocksBA = null;
-const APP_VERSION = 'v0.8 (2025-12-25)';
+const APP_VERSION = 'v0.81 (2025-12-25)';
 
 // Log to console and to the autoload debug panel
 function debugLog(message) {
@@ -82,11 +82,11 @@ async function loadDefaultAB() {
     const txt = await res.text();
     blocksAB = parseTSV(txt);
     const count = Object.keys(blocksAB).reduce((s, c) => s + blocksAB[c].length, 0);
-    if (statusAB) statusAB.textContent = 'PomBase→Leupold clade: blocks file loaded (' + count + ' blocks)';
-    debugLog('PomBase→Leupold clade blocks file loaded: ' + count + ' blocks');
+    if (statusAB) statusAB.textContent = 'PomBase→Leupold clade consensus: blocks file loaded (' + count + ' blocks)';
+    debugLog('PomBase→Leupold clade consensus blocks file loaded: ' + count + ' blocks');
   } catch (e) {
-    if (statusAB) statusAB.textContent = 'PomBase→Leupold clade: failed (' + e.message + ')';
-    debugLog('PomBase→Leupold clade failed: ' + e.message);
+    if (statusAB) statusAB.textContent = 'PomBase→Leupold clade consensus: failed (' + e.message + ')';
+    debugLog('PomBase→Leupold clade consensus failed: ' + e.message);
   }
 }
 
@@ -100,11 +100,11 @@ async function loadDefaultBA() {
     const txt = await res.text();
     blocksBA = parseTSV(txt);
     const count = Object.keys(blocksBA).reduce((s, c) => s + blocksBA[c].length, 0);
-    if (statusBA) statusBA.textContent = 'Leupold clade→PomBase: blocks file loaded (' + count + ' blocks)';
-    debugLog('Leupold clade→PomBase blocks file loaded: ' + count + ' blocks');
+    if (statusBA) statusBA.textContent = 'Leupold clade consensus→PomBase: blocks file loaded (' + count + ' blocks)';
+    debugLog('Leupold clade consensus→PomBase blocks file loaded: ' + count + ' blocks');
   } catch (e) {
-    if (statusBA) statusBA.textContent = 'Leupold clade→PomBase: failed (' + e.message + ')';
-    debugLog('Leupold clade→PomBase failed: ' + e.message);
+    if (statusBA) statusBA.textContent = 'Leupold clade consensus→PomBase: failed (' + e.message + ')';
+    debugLog('Leupold clade consensus→PomBase failed: ' + e.message);
   }
 }
 
@@ -393,8 +393,8 @@ async function init() {
 
   const sAB = document.getElementById('statusAB');
   const sBA = document.getElementById('statusBA');
-  if (sAB) sAB.textContent = 'PomBase→Leupold clade: autoload starting';
-  if (sBA) sBA.textContent = 'Leupold clade→PomBase: autoload starting';
+  if (sAB) sAB.textContent = 'PomBase→Leupold clade consensus: autoload starting';
+  if (sBA) sBA.textContent = 'Leupold clade consensus→PomBase: autoload starting';
 
   // Attach UI handlers
   const el = (id) => document.getElementById(id);
@@ -427,9 +427,9 @@ async function init() {
 function updateDirectionNote(mode) {
   const dn = document.getElementById('directionNote');
   if (!dn) return;
-  if (mode === 'AB') dn.textContent = 'Current direction: A = PomBase → B = Leupold clade';
-  else if (mode === 'BA') dn.textContent = 'Current direction: A = Leupold clade → B = PomBase';
-  else if (mode === 'RT') dn.textContent = 'Current direction: A = PomBase → B = Leupold clade → A = PomBase';
+  if (mode === 'AB') dn.textContent = 'Current direction: A = PomBase → B = Leupold clade consensus';
+  else if (mode === 'BA') dn.textContent = 'Current direction: A = Leupold clade consensus → B = PomBase';
+  else if (mode === 'RT') dn.textContent = 'Current direction: A = PomBase → B = Leupold clade consensus → A = PomBase';
 }
 
 // Global error logger to surface uncaught errors
