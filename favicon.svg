@@ -2,34 +2,36 @@
   <!-- Stylized Fission Yeast Cell (Based on provided icon) -->
   <!-- Shape: Capsule/Pill, rotated 45 degrees -->
   <!-- Style: Minimalist line art, white fill, dark grey outline -->
+  <!-- Update: Maximized size to fill the viewbox -->
   
   <!-- Group rotated 45 degrees around center (50,50) -->
   <g transform="rotate(-45, 50, 50)">
     <!-- Main Cell Body -->
     <!-- Pill shape: Rectangle with fully rounded ends -->
-    <rect x="20" y="30" width="60" height="40" rx="20" ry="20" 
+    <!-- Scaled up to ~90% of diagonal -->
+    <rect x="12" y="26" width="76" height="48" rx="24" ry="24" 
           fill="#ffffff" 
           stroke="#444444" 
-          stroke-width="5" />
+          stroke-width="6" />
     
     <!-- Septum (Division Ring) -->
     <!-- Line across the middle -->
-    <line x1="50" y1="30" x2="50" y2="70" 
+    <line x1="50" y1="26" x2="50" y2="74" 
           stroke="#444444" 
-          stroke-width="4" 
+          stroke-width="5" 
           stroke-linecap="butt" />
           
     <!-- Nuclei/Organelles (Two small circles) -->
     <!-- Left circle -->
-    <circle cx="35" cy="50" r="5" 
+    <circle cx="31" cy="50" r="6" 
             fill="none" 
             stroke="#444444" 
-            stroke-width="4" />
+            stroke-width="5" />
             
     <!-- Right circle -->
-    <circle cx="65" cy="50" r="5" 
+    <circle cx="69" cy="50" r="6" 
             fill="none" 
             stroke="#444444" 
-            stroke-width="4" />
+            stroke-width="5" />
   </g>
 </svg>
