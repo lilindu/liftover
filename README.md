@@ -15,6 +15,7 @@
 
 *   **PomBase ↔ Leupold Consensus**: Mapping between the standard *S. pombe* reference (PomBase) and the Leupold clade consensus.
 *   **PomBase ↔ DY47073**: Mapping between PomBase and the DY47073 strain.
+*   **PomBase ↔ DY47071**: Mapping between PomBase and the DY47071 strain.
 
 ## Usage
 

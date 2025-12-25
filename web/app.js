@@ -17,6 +17,13 @@ const GENOME_PAIRS = {
     genomeB: 'DY47073',
     fileAB: 'data/pombase_dy47073/A_to_B.blocks.tsv',
     fileBA: 'data/pombase_dy47073/B_to_A.blocks.tsv'
+  },
+  'pombase_dy47071': {
+    name: 'PomBase ↔ DY47071',
+    genomeA: 'PomBase',
+    genomeB: 'DY47071',
+    fileAB: 'data/pombase_dy47071/A_to_B.blocks.tsv',
+    fileBA: 'data/pombase_dy47071/B_to_A.blocks.tsv'
   }
 };
 
