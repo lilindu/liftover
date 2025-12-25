@@ -37,12 +37,34 @@ The project is hosted on GitHub Pages. The core logic resides in the `web/` dire
 
 ### Adding New Genome Pairs
 
-To add a new pair (e.g., GenomeX ↔ GenomeY):
+To add a new pair (e.g., GenomeX ↔ GenomeY), use the `cli/generate_blocks.sh` script.
 
-1.  Create a new directory in `web/data/` (e.g., `web/data/genomex_genomey/`).
-2.  Generate the block files `A_to_B.blocks.tsv` and `B_to_A.blocks.tsv` using the provided CLI tools (see `cli/` folder).
-3.  Place the block files in the new directory.
-4.  Update `GENOME_PAIRS` in `web/app.js` to register the new pair.
+1.  **Prepare FASTA files**: Ensure you have the FASTA files for both genomes (e.g., `genomeX.fa` and `genomeY.fa`).
+2.  **Run the Generation Script**:
+    ```bash
+    ./cli/generate_blocks.sh <genomeX.fa> <genomeY.fa> web/data/genomex_genomey
+    ```
+    This script automatically:
+    *   Aligns Genome X → Genome Y (and vice-versa) using `minimap2`.
+    *   Converts the alignments to block files (`A_to_B.blocks.tsv` and `B_to_A.blocks.tsv`).
+    *   Places them in the specified output directory.
+
+3.  **Update Configuration**:
+    *   Open `web/app.js`.
+    *   Add a new entry to the `GENOME_PAIRS` object:
+        ```javascript
+        'genomex_genomey': {
+          name: 'Genome X ↔ Genome Y',
+          genomeA: 'Genome X',
+          genomeB: 'Genome Y',
+          fileAB: 'data/genomex_genomey/A_to_B.blocks.tsv',
+          fileBA: 'data/genomex_genomey/B_to_A.blocks.tsv'
+        },
+        ```
+
+### Requirements for Script
+*   `minimap2` must be installed. The script defaults to a specific path; edit `cli/generate_blocks.sh` if your path differs.
+*   Python 3.
 
 ## License
 
