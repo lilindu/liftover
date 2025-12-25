@@ -1,6 +1,6 @@
 # SchizoLift
 
-**SchizoLift** is a client-side web tool for genome coordinate conversion for _Schizosaccharomyces_ species. It allows researchers to easily convert genomic coordinates between different reference genomes and clade consensus sequences.
+**SchizoLift** is a client-side web tool for genome coordinate conversion for _Schizosaccharomyces_ species. It allows researchers to easily convert genomic coordinates between different genomes of the same species.
 
 **Live Tool:** [https://lilindu.github.io/liftover/](https://lilindu.github.io/liftover/)
 
@@ -13,7 +13,7 @@
 
 ## Supported Genome Pairs
 
-*   **PomBase ↔ Leupold Consensus**: Mapping between the standard *S. pombe* reference (PomBase) and the Leupold clade consensus.
+*   **PomBase ↔ Leupold Consensus**: Mapping between the standard *S. pombe* reference (PomBase) and the Leupold Consensus.
 *   **PomBase ↔ DY47073**: Mapping between PomBase and the DY47073 strain.
 *   **PomBase ↔ DY47071**: Mapping between PomBase and the DY47071 strain.
 
