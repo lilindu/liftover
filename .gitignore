@@ -1,0 +1,20 @@
+# System
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# Data (exclude large files)
+*.fa
+*.rar
+*.paf
+*.bed
+*.pptx
+*.xlsx
+
+# Temporary
+tmp_*
+test_*.html
+diagnostic.html
+sample.*
