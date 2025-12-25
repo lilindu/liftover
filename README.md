@@ -93,7 +93,7 @@ Pipeline notes:
 
 ## Web UI
 
-- Title/subtitle: pombe_liftover, with a version badge (e.g., `v0.7 (2025-12-25)`).
+- Title/subtitle: pombe_liftover, with a version badge (e.g., `v0.8 (2025-12-25)`).
 - Status chips: AB/BA loaded blocks.
 - Input area: textarea accepting `CHR:POS` or `CHR:START-END` (1‑based, inclusive).
 - Buttons: AB, BA, Round‑Trip, Download (unified primary style).
@@ -106,7 +106,7 @@ Pipeline notes:
 
 ## Versioning & Cache Busting
 
-- `APP_VERSION` is a literal string (e.g., `v0.7 (2025-12-25)`) set in `app.js`.
+- `APP_VERSION` is a literal string (e.g., `v0.8 (2025-12-25)`) set in `app.js`.
 - `index.html` loads `app.js` with `?v=autoload_fix_<n>` to force fresh loads on deployment.
 
 ## Local Development

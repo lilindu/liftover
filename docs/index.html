@@ -44,9 +44,9 @@
     <h3>Input coordinates (one per line, CHR:POS or CHR:START-END; coordinates are 1-based and inclusive)</h3>
     <textarea id="coords" placeholder="I:1000&#10;II:250-400&#10;III:42"></textarea>
     <div class="row">
-      <button id="runAB" class="btn btn-primary">Liftover PomBase→Leupold clade</button>
-      <button id="runBA" class="btn btn-primary">Liftover Leupold clade→PomBase</button>
-      <button id="runRoundtrip" class="btn btn-primary">Round-Trip PomBase→Leupold clade→PomBase</button>
+      <button id="runAB" class="btn btn-primary">Liftover PomBase→Leupold</button>
+      <button id="runBA" class="btn btn-primary">Liftover Leupold→PomBase</button>
+      <button id="runRoundtrip" class="btn btn-primary">Round-Trip PomBase→Leupold→PomBase</button>
       <button id="download" class="btn btn-primary">Download Results</button>
     </div>
     <h3>Results</h3>
@@ -70,6 +70,6 @@
       <tbody id="outBody"></tbody>
     </table>
     <pre id="out" style="display:none"></pre>
-    <script src="app.js?v=v0.7"></script>
+    <script src="app.js?v=v0.8"></script>
   </body>
 </html>
