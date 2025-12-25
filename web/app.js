@@ -1,7 +1,7 @@
 // Global state
 let blocksAB = null;
 let blocksBA = null;
-const APP_VERSION = 'v1.02 (2025-12-25)';
+const APP_VERSION = 'v1.03 (2025-12-25)';
 
 const GENOME_PAIRS = {
   'pombase_leupold': {

@@ -1,3 +1,0 @@
-contigA	startA	endA	contigB	startB	endB	strand	status
-I	97000	98000					CROSSES_BLOCK
-I	50000	50100	I	62991	63091	+	OK

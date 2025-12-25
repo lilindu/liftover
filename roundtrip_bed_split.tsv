@@ -1,3 +1,0 @@
-contigA	startA	endA	contigB	startB	endB	contigA2	startA2	endA2	status
-I	97000	98000	I	109991	110335				FAIL
-I	50000	50100	I	62991	63091	I	50000	50100	PASS
